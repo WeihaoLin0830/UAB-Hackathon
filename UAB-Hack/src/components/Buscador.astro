@@ -1,0 +1,320 @@
+---
+import RestaurantCard from './RestaurantCard.astro';
+
+// Datos de ejemplo para los restaurantes
+const restaurantes = [
+{
+    id: 1,
+    nombre: "La Trattoria Italiana",
+    marca: "Grupo Italiano",
+    categoria: "Italiano",
+    calificacion: 4.7,
+    imagen: "https://images.unsplash.com/photo-1514933651103-005eec06c04b?q=80&w=1974&auto=format&fit=crop",
+    descripcion: "Auténtica cocina italiana con pasta fresca casera.",
+    horari: "12:00 - 23:00",
+    telefon: "93 123 45 67",
+    web: "www.trattoriaitaliana.com",
+    resenyes: "Excelente pasta, ambiente acogedor",
+    quant_resenyes: 245,
+    distancia: "1.2 km"
+},
+{
+    id: 2,
+    nombre: "El Jardín Verde",
+    marca: "Eco Foods",
+    categoria: "Vegetariano",
+    calificacion: 4.5,
+    imagen: "https://images.unsplash.com/photo-1623428187969-5da2dcea5ebf?q=80&w=1964&auto=format&fit=crop",
+    descripcion: "Platos vegetarianos creativos con ingredientes de proximidad.",
+    horari: "10:00 - 22:00",
+    telefon: "93 234 56 78",
+    web: "www.jardinverde.com",
+    resenyes: "Buenas opciones vegetarianas, excelente servicio",
+    quant_resenyes: 187,
+    distancia: "0.8 km"
+},
+{
+    id: 3,
+    nombre: "Sabores de Asia",
+    marca: "Asian Fusion",
+    categoria: "Asiático",
+    calificacion: 4.8,
+    imagen: "https://images.unsplash.com/photo-1579684947550-22e945225d9a?q=80&w=1974&auto=format&fit=crop",
+    descripcion: "Fusión de cocinas asiáticas con productos frescos.",
+    horari: "13:00 - 23:30",
+    telefon: "93 345 67 89",
+    web: "www.saboresasia.com",
+    resenyes: "La mejor comida asiática de la zona",
+    quant_resenyes: 320,
+    distancia: "1.5 km"
+},
+{
+    id: 4,
+    nombre: "El Rincón Mediterráneo",
+    marca: "Med Food",
+    categoria: "Mediterráneo",
+    calificacion: 4.6,
+    imagen: "https://images.unsplash.com/photo-1559339352-11d035aa65de?q=80&w=1974&auto=format&fit=crop",
+    descripcion: "Pescados y mariscos frescos con esencia mediterránea.",
+    horari: "13:30 - 23:00",
+    telefon: "93 456 78 90",
+    web: "www.rinconmediterraneo.com",
+    resenyes: "Pescado fresco y buen servicio",
+    quant_resenyes: 210,
+    distancia: "0.5 km"
+},
+{
+    id: 5,
+    nombre: "Taquería Don José",
+    marca: "Auténtico México",
+    categoria: "Mexicano",
+    calificacion: 4.4,
+    imagen: "https://images.unsplash.com/photo-1551504734-5ee1c4a3479b?q=80&w=1974&auto=format&fit=crop",
+    descripcion: "Auténticos tacos mexicanos y especialidades regionales.",
+    horari: "12:00 - 24:00",
+    telefon: "93 567 89 01",
+    web: "www.taqueriadonjose.com",
+    resenyes: "Tacos auténticos y buen ambiente",
+    quant_resenyes: 178,
+    distancia: "2.1 km"
+},
+{
+    id: 6,
+    nombre: "Café Primavera",
+    marca: "Coffee & Co",
+    categoria: "Cafetería",
+    calificacion: 4.3,
+    imagen: "https://images.unsplash.com/photo-1445116572660-236099ec97a0?q=80&w=1971&auto=format&fit=crop",
+    descripcion: "Desayunos gourmet y repostería artesanal.",
+    horari: "07:00 - 20:00",
+    telefon: "93 678 90 12",
+    web: "www.cafeprimavera.com",
+    resenyes: "Excelente café y pasteles caseros",
+    quant_resenyes: 156,
+    distancia: "0.3 km"
+},
+{
+    id: 7,
+    nombre: "Sushi Master",
+    marca: "Japan Foods",
+    categoria: "Japonés",
+    calificacion: 4.9,
+    imagen: "https://images.unsplash.com/photo-1611143669185-af224c5e3252?q=80&w=2070&auto=format&fit=crop",
+    descripcion: "El mejor sushi de la ciudad con pescado fresco diariamente.",
+    horari: "13:00 - 23:00",
+    telefon: "93 789 01 23",
+    web: "www.sushimaster.com",
+    resenyes: "El mejor sushi que he probado",
+    quant_resenyes: 290,
+    distancia: "1.7 km"
+},
+{
+    id: 8,
+    nombre: "Burger House",
+    marca: "Premium Burgers",
+    categoria: "Americano",
+    calificacion: 4.2,
+    imagen: "https://images.unsplash.com/photo-1466978913421-dad2ebd01d17?q=80&w=1974&auto=format&fit=crop",
+    descripcion: "Hamburguesas gourmet con ingredientes locales y artesanales.",
+    horari: "12:00 - 23:30",
+    telefon: "93 890 12 34",
+    web: "www.burgerhouse.com",
+    resenyes: "Buenas hamburguesas, algo caras",
+    quant_resenyes: 205,
+    distancia: "0.9 km"
+},
+{
+    id: 9,
+    nombre: "Parrilla Argentina",
+    marca: "Buenos Aires",
+    categoria: "Carnes",
+    calificacion: 4.7,
+    imagen: "https://images.unsplash.com/photo-1560611588-163f295eb145?q=80&w=2070&auto=format&fit=crop",
+    descripcion: "Carnes de primera calidad a la parrilla estilo argentino.",
+    horari: "13:00 - 23:00",
+    telefon: "93 901 23 45",
+    web: "www.parrillaargentina.com",
+    resenyes: "Excelentes carnes y buen vino",
+    quant_resenyes: 265,
+    distancia: "1.3 km"
+},
+{
+    id: 10,
+    nombre: "Le Bistro",
+    marca: "Cuisine Française",
+    categoria: "Francés",
+    calificacion: 4.8,
+    imagen: "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?q=80&w=2070&auto=format&fit=crop",
+    descripcion: "Auténtica cocina francesa con toques modernos.",
+    horari: "13:00 - 23:00",
+    telefon: "93 012 34 56",
+    web: "www.lebistro.com",
+    resenyes: "Experiencia gastronómica excepcional",
+    quant_resenyes: 230,
+    distancia: "1.1 km"
+},
+{
+    id: 11,
+    nombre: "Thai Fusion",
+    marca: "Thai Group",
+    categoria: "Asiático",
+    calificacion: 4.5,
+    imagen: "https://images.unsplash.com/photo-1559339352-11d035aa65de?q=80&w=1974&auto=format&fit=crop",
+    descripcion: "Sabores exóticos de Tailandia en platos creativos.",
+    horari: "13:00 - 23:30",
+    telefon: "93 123 45 67",
+    web: "www.thaifusion.com",
+    resenyes: "Auténtica cocina tailandesa",
+    quant_resenyes: 195,
+    distancia: "1.8 km"
+},
+{
+    id: 12,
+    nombre: "Pizza Napolitana",
+    marca: "Napoli's",
+    categoria: "Italiano",
+    calificacion: 4.6,
+    imagen: "https://images.unsplash.com/photo-1513104890138-7c749659a591?q=80&w=2070&auto=format&fit=crop",
+    descripcion: "Auténtica pizza napolitana con horno de leña.",
+    horari: "12:00 - 23:00",
+    telefon: "93 234 56 78",
+    web: "www.pizzanapolitana.com",
+    resenyes: "Pizza deliciosa y auténtica",
+    quant_resenyes: 255,
+    distancia: "0.6 km"
+}
+];
+
+// nom, marca, tipus, horari, telefon, web, resenyes, quant_resenyes, distància, 
+
+// Eliminar la generación de categorías únicas
+---
+
+<section class="buscador-container">
+  <div class="buscador-wrapper">
+    <h2>Encuentra tu restaurante ideal</h2>
+    <div class="search-container">
+      <div class="search-box">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="search-icon">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <input type="text" placeholder="Buscar restaurantes, cocina, ubicación..." id="search-input">
+      </div>
+      
+      <!-- Eliminado el div filter-container -->
+    </div>
+  </div>
+  
+  <div class="results-container">
+    <div class="results-grid">
+      {restaurantes.map(restaurante => (
+        <RestaurantCard 
+          id={restaurante.id} 
+          nombre={restaurante.nombre}
+          marca={restaurante.marca} 
+          categoria={restaurante.categoria} 
+          calificacion={restaurante.calificacion} 
+          imagen={restaurante.imagen} 
+          descripcion={restaurante.descripcion}
+          horari={restaurante.horari}
+          telefon={restaurante.telefon}
+          web={restaurante.web}
+          resenyes={restaurante.resenyes}
+          quant_resenyes={restaurante.quant_resenyes}
+          distancia={restaurante.distancia}
+        />
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .buscador-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem 3rem;
+    font-family: 'Inter', system-ui, sans-serif;
+    height: 100%;
+    overflow-y: auto;
+  }
+
+  .buscador-wrapper {
+    text-align: center;
+    margin-bottom: 2.5rem;
+  }
+
+  h2 {
+    font-size: 1.75rem;
+    font-weight: 600;
+    color: var(--text-color);
+    margin-bottom: 1.5rem;
+  }
+
+  .search-container {
+    max-width: 700px;
+    margin: 0 auto;
+  }
+
+  .search-box {
+    display: flex;
+    align-items: center;
+    box-shadow: var(--shadow-sm);
+    border-radius: 50px;
+    overflow: hidden;
+    position: relative;
+    margin-bottom: 1.5rem;
+    border: 1px solid var(--border-color);
+    padding: 0 1rem;
+    background-color: white;
+  }
+  
+  .search-icon {
+    color: var(--placeholder-color);
+    margin-right: 0.5rem;
+  }
+
+  input {
+    flex: 1;
+    padding: 1rem 0.5rem;
+    font-size: 0.95rem;
+    border: none;
+    outline: none;
+    background-color: transparent;
+  }
+
+  /* Eliminar estilos del filter-container y filter-pill */
+
+  .results-container {
+    margin-top: 3rem;
+  }
+
+  .results-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 1.5rem;
+  }
+
+  @media (max-width: 768px) {
+    .results-grid {
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 1.25rem;
+    }
+    
+    h2 {
+      font-size: 1.5rem;
+    }
+    
+    .buscador-container {
+      padding: 1.5rem 1rem 2rem;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .results-grid {
+      grid-template-columns: 1fr;
+    }
+    
+    /* Eliminar estilos mobile de filter-container */
+  }
+</style>
