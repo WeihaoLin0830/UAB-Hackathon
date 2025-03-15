@@ -1,0 +1,230 @@
+{
+    "type": "FeatureCollection",
+    "features": [
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [-99.167, 19.427]
+            },
+            "properties": {
+                "id": 1,
+                "crime_type": "Robo",
+                "date": "2023-03-15",
+                "time": "14:30",
+                "borough": "Cuauhtémoc",
+                "severity": "Medio"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [-99.134, 19.432]
+            },
+            "properties": {
+                "id": 2,
+                "crime_type": "Asalto",
+                "date": "2023-03-17",
+                "time": "21:15",
+                "borough": "Benito Juárez",
+                "severity": "Alto"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [-99.204, 19.331]
+            },
+            "properties": {
+                "id": 3,
+                "crime_type": "Vandalismo",
+                "date": "2023-03-14",
+                "time": "02:45",
+                "borough": "Coyoacán",
+                "severity": "Bajo"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [-99.147, 19.385]
+            },
+            "properties": {
+                "id": 4,
+                "crime_type": "Robo de auto",
+                "date": "2023-03-18",
+                "time": "19:20",
+                "borough": "Álvaro Obregón",
+                "severity": "Medio"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [-99.122, 19.404]
+            },
+            "properties": {
+                "id": 5,
+                "crime_type": "Asalto",
+                "date": "2023-03-16",
+                "time": "23:10",
+                "borough": "Cuauhtémoc",
+                "severity": "Alto"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [-99.188, 19.357]
+            },
+            "properties": {
+                "id": 6,
+                "crime_type": "Fraude",
+                "date": "2023-03-12",
+                "time": "10:30",
+                "borough": "Miguel Hidalgo",
+                "severity": "Medio"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [-99.216, 19.412]
+            },
+            "properties": {
+                "id": 7,
+                "crime_type": "Vandalismo",
+                "date": "2023-03-11",
+                "time": "03:45",
+                "borough": "Miguel Hidalgo",
+                "severity": "Bajo"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [-99.152, 19.451]
+            },
+            "properties": {
+                "id": 8,
+                "crime_type": "Robo",
+                "date": "2023-03-10",
+                "time": "17:15",
+                "borough": "Azcapotzalco",
+                "severity": "Medio"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [-99.092, 19.422]
+            },
+            "properties": {
+                "id": 9,
+                "crime_type": "Asalto armado",
+                "date": "2023-03-15",
+                "time": "22:40",
+                "borough": "Venustiano Carranza",
+                "severity": "Alto"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [-99.178, 19.374]
+            },
+            "properties": {
+                "id": 10,
+                "crime_type": "Robo de auto",
+                "date": "2023-03-17",
+                "time": "01:30",
+                "borough": "Benito Juárez",
+                "severity": "Medio"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [-99.227, 19.366]
+            },
+            "properties": {
+                "id": 11,
+                "crime_type": "Vandalismo",
+                "date": "2023-03-18",
+                "time": "04:20",
+                "borough": "Álvaro Obregón",
+                "severity": "Bajo"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [-99.161, 19.402]
+            },
+            "properties": {
+                "id": 12,
+                "crime_type": "Asalto",
+                "date": "2023-03-16",
+                "time": "20:15",
+                "borough": "Cuauhtémoc",
+                "severity": "Alto"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [-99.141, 19.371]
+            },
+            "properties": {
+                "id": 13,
+                "crime_type": "Fraude",
+                "date": "2023-03-13",
+                "time": "13:45",
+                "borough": "Benito Juárez",
+                "severity": "Medio"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [-99.198, 19.397]
+            },
+            "properties": {
+                "id": 14,
+                "crime_type": "Robo",
+                "date": "2023-03-14",
+                "time": "16:50",
+                "borough": "Miguel Hidalgo",
+                "severity": "Medio"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [-99.112, 19.387]
+            },
+            "properties": {
+                "id": 15,
+                "crime_type": "Asalto armado",
+                "date": "2023-03-12",
+                "time": "21:35",
+                "borough": "Iztacalco",
+                "severity": "Alto"
+            }
+        }
+    ]
+}
