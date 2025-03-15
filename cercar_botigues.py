@@ -443,13 +443,7 @@ if __name__ == "__main__":
     
     print("Buscando hamburguesa en Ciudad de México...")
     hamburguesas = buscar_con_coordenadas("hamburguesa", lat_cdmx, lon_cdmx, 5000)
-    #hamburguesas_top5 = hamburguesas[:5]  # Obtener solo los cinco más altos
-
-    hamburguesas_cadena = [h for h in hamburguesas if h['marca'] != "Desconocida"]
-    print(f"Se encontraron {len(hamburguesas_cadena)} hamburguesas de cadena cerca del Zócalo:")
-    hamburguesas_top5 = hamburguesas_cadena[:5]
-
-    print(f"Se encontraron {len(hamburguesas_top5)} hamburguesas cerca del Zócalo:")
+    hamburguesas_top5 = hamburguesas[:5]  # Obtener solo los cinco más altos
     
     for i, hamburguesa in enumerate(hamburguesas_top5, 1):
         print(f"{i}. Nombre: {hamburguesa['nombre']}")
@@ -471,19 +465,9 @@ if __name__ == "__main__":
     # Ejemplo con geolocalización por IP
     print("\nBuscando cafeterías cerca de tu ubicación actual...")
     cafeterias = buscar_con_ubicacion_actual("cafe", 1500)
-    #cafeterias_top5 = cafeterias[:5]  # Obtener solo los cinco más altos
-
-    # Filtro para hamburguesas de cadena
-
-
-# Lo mismo para cafeterías
-    cafeterias_cadena = [c for c in cafeterias if c['marca'] != "Desconocida"]
-    print(f"Se encontraron {len(cafeterias_cadena)} cafeterías de cadena cerca:")
+    cafeterias_top5 = cafeterias[:5]  # Obtener solo los cinco más altos
 
 # También puedes tomar los top 5 después de filtrar
-    cafeterias_top5 = cafeterias_cadena[:5]
-
-    print(f"Se encontraron {len(cafeterias_top5)} cafeterías cerca:")
     
     for i, cafe in enumerate(cafeterias_top5, 1):
         print(f"{i}. Nombre: {cafe['nombre']}")
