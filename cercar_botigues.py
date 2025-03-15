@@ -36,7 +36,7 @@ def determinar_tipo_lugar(tags):
         elif tags["cuisine"] == "japanese":
             return "Restaurante Japonés"
         elif tags["cuisine"] == "chinese":
-            return "Restaurante"
+            return "Restaurante Chino"
 
 def buscar_lugares_cercanos(busqueda, lat, lon, radio=5000):
     """
@@ -187,21 +187,21 @@ def buscar_lugares_cercanos(busqueda, lat, lon, radio=5000):
                 tipo_mostrar = determinar_tipo_lugar(tags)
                 
                 resultados.append({
-    "nombre": tags.get("name", "Sin nombre"),
-    "marca": tags.get("brand", "Desconocida"),
-    "tipo_lugar": determinar_tipo_lugar(tags),
-    "horarios": tags.get("opening_hours", "Horario no disponible"),
-    "teléfono": tags.get("phone", "No disponible"),
-    "web": tags.get("website", "No disponible"),
-    "reseñas_count": tags.get("review:count", "0"),  # Número de reseñas
-    "calificación": tags.get("review:rating", "No disponible"),  # Calificación promedio
-    "dirección": obtener_direccion(tags),
-    "latitud": lugar_lat,
-    "longitud": lugar_lon,
-    "distancia": distancia,
-    "puntuacion": puntuacion,
-    "tags": tags  # Guardar todos los tags para depuración
-})
+                "nombre": tags.get("name", "Sin nombre"),
+                "marca": tags.get("brand", "Desconocida"),
+                "tipo_lugar": determinar_tipo_lugar(tags),
+                "horarios": tags.get("opening_hours", "Horario no disponible"),
+                "teléfono": tags.get("phone", "No disponible"),
+                "web": tags.get("website", "No disponible"),
+                "reseñas_count": tags.get("review:count", "0"),  # Número de reseñas
+                "calificación": tags.get("review:rating", "No disponible"),  # Calificación promedio
+                "dirección": obtener_direccion(tags),
+                "latitud": lugar_lat,
+                "longitud": lugar_lon,
+                "distancia": distancia,
+                "puntuacion": puntuacion,
+                "tags": tags  # Guardar todos los tags para depuración
+            })
 
         
         # Ordenar por puntuación (primero) y distancia (segundo criterio)
@@ -434,7 +434,6 @@ def buscar_con_coordenadas(busqueda, lat, lon, radio=5000):
         list: Lista de lugares encontrados
     """
     return buscar_lugares_cercanos(busqueda, lat, lon, radio)
-
 # Ejemplo de uso
 if __name__ == "__main__":
     # Ejemplo con coordenadas fijas (Ciudad de México - Zócalo)
@@ -485,3 +484,4 @@ if __name__ == "__main__":
         print(f"   Puntuación: {cafe['puntuacion']}")
         print(f"   Tags: {cafe['tags']}")
         print()
+
