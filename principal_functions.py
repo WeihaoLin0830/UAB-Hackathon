@@ -15,6 +15,33 @@ import math
     return gpd.read_file(file_path)
 
 buffer = load_crimes_geojson('crimes.geojson')"""
+def get_intersecting_crimes(route_coords, crime_buffers_gdf):
+    """
+    Find crime buffers that intersect with a route
+    
+    Args:
+        route_coords: List of coordinate tuples [(lat, lon), ...]
+        crime_buffers_gdf: GeoDataFrame with crime buffer data
+    
+    Returns:
+        List of crime records that intersect with the route
+    """
+    # Create a LineString from the route coordinates
+    # Note: route_coords is (lat, lon) format but LineString expects (lon, lat)
+    route_points = [(lon, lat) for lat, lon in route_coords]
+    route_line = LineString(route_points)
+    
+    # Find intersecting crime buffers
+    intersecting_buffers = crime_buffers_gdf[crime_buffers_gdf.intersects(route_line)]
+    # Return the relevant crime information
+    crime_list = []
+    for _, crime in intersecting_buffers.iterrows():
+
+        print(crime.head())
+        if 'delito' in crime:
+            crime_list.append(crime['delito'])
+    
+    return crime_list
 
 def combine_node_edge_weights(graph, node_weight_attribute='node_weight', edge_weight_attribute='edge_weight',
                              output_attribute='combined_weight', alpha=0.5):
@@ -204,10 +231,10 @@ def crop_graph(origin, destination, graph):
     return subgraph
 
 def buscar_ruta(origin, destination, time, graph, buffer):
-    #if time in buffer['time'].unique():
-    #    crimes_df = buffer[buffer['time'] == time]
-    #else:
-    crimes_df = buffer.copy()
+    if time in buffer['time_zones'].unique():
+        crimes_df = buffer[buffer['time_zones'] == time]
+    else:
+        crimes_df = buffer.copy()
 
     origin_node = ox.distance.nearest_nodes(graph, origin[1], origin[0])
     destination_node = ox.distance.nearest_nodes(graph, destination[1], destination[0])
@@ -236,6 +263,8 @@ import random
 from math import cos, sin
 
 crime_buffers = gpd.read_file('crime_buffers.geojson')
+
+print(crime_buffers.head())
 
 def random_point_within_radius(center, radius_km):
     radius_deg = radius_km / 111  # Rough conversion from km to degrees
