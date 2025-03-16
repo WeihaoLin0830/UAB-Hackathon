@@ -21,18 +21,23 @@ client = genai.Client(api_key = API_KEY)
 
 #  Adaptar las llamadas a diferentes funciones dependiendo de la hora del día.
 
+
 class SafeRouteChatbot:
 
-    def free(self, user_message):
+    def free(self, user_message, context=[]):
+        if context:
+            prompt = f"""
+            {user_message} + {context}
+            """
         response = client.models.generate_content(
-            model="gemini-2.0-flash", contents=[user_message]
+            model="gemini-2.0-flash", contents=[prompt]
         )        
-        return response
+        return response.text
         
     
     def generate_response(self, origen, destino, context):
         # Configurar el geocodificador
-        geolocator = Nominatim(user_agent="geoapiExercises")
+        geolocator = Nominatim(user_agent="safe_route_chatbot")
 
         # Obtener la dirección
         orig = geolocator.reverse((origen[0], origen[1]), language="es") 
@@ -52,7 +57,7 @@ class SafeRouteChatbot:
         
         # Combine explanations
            
-        return safest_route_explanation
+        return safest_route_explanation.text
         
         # Load routing data if available
         
@@ -138,22 +143,23 @@ class SafeRouteChatbot:
         Explica por qué esta ruta es la más segura comparando con la otra ruta más rápida, mencionando las áreas peligrosas que se evitaron y por qué son peligrosas (tipos de crímenes, horarios). Menciona también cómo el horario de viaje afecta la seguridad. La explicación debe ser clara, informativa y escrita en español.
         """
         #Áreas evitadas: {avoided_areas_str}
-        
         return prompt
     
     def _generate_explanation(self, prompt):
-        """Generate explanation using LLM"""
+        """Generate explanation using LLM and clean the response"""
+        # Obtener respuesta del modelo
         response = client.models.generate_content(
             model="gemini-2.0-flash", contents=[prompt]
-        )        
-            
+        )
         return response
-    
+
+
+chatbot = SafeRouteChatbot()
+print(chatbot.generate_response((40.4167, -3.70325), (41.38879, 2.15899), ['c1', 'c2', 'c3', 'c4', 'c5', 'c6', 'c7', 'c8', 'c9', 'c10']))
 
 '''
 # Modo     
 def conect():
-    chatbot = SafeRouteChatbot()
     
     print("Modo interactivo. Escribe 'salir' para terminar.")
     while True:
