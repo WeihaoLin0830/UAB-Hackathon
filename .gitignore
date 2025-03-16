@@ -174,3 +174,4 @@ cython_debug/
 .pypirc
 
 cache_MexicoCity_walk.graphml
+crime_buffers.geojson
