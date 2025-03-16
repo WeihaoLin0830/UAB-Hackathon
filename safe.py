@@ -24,11 +24,19 @@ client = genai.Client(api_key = API_KEY)
 
 class SafeRouteChatbot:
 
-    def free(self, user_message, context=[]):
-        if context:
-            prompt = f"""
-            {user_message} + {context}
-            """
+    def free(self, user_message, context=None):
+        prompt = ""
+        
+            
+        prompt1 = "Eres un chatbot que proporciona contexto e información sobre rutas seguras en la Ciudad de México. Tienes que responder de manera consisa y resumida. no hagas textos largos dificiles de leer"
+
+        if context is not None:
+            prompt2 = f"En el contexto, la ruta más rapida intersecta con puntos donde el ultimo año se han producido los siguientes delitos. Es importante que aportes contexto de porque se ha generado una ruta alternativa evitandolos y puedas responder dudas del usuario respecto el tipo de delitos frecuentes en las areas delimitadas: contexto: {context}"
+
+            prompt = f"{prompt1} {prompt2}"
+        
+        prompt += f"Mensage del usuario: {user_message}"
+        
         response = client.models.generate_content(
             model="gemini-2.0-flash", contents=[prompt]
         )        

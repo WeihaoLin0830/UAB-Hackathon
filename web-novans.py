@@ -256,10 +256,15 @@ with col2:
                     )
 
                     msg_lst = get_intersecting_crimes(rutas[1], data['crime'])
-                    print(msg_lst)
-                    answer = chat.generate_response(origen, destino, msg_lst)
+                    
+                    str_lst = "\n".join(msg_lst)
 
-                    st.session_state.messages.append(answer)
+                    answer = chat.free("Explica porque se ha elegido una ruta alternativa a la más rapida, que es la que intersecciona con lo comentado", context=str_lst)
+
+                    print(answer)
+
+
+                    st.session_state.messages.append({"role": "assistant", "content": answer})
                     
                     st.session_state.map_state['routes'] = rutas
                     st.rerun()
