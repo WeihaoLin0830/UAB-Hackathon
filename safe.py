@@ -5,6 +5,8 @@ import json
 from google import genai
 from dotenv import load_dotenv
 from collections import Counter
+from geopy.geocoders import Nominatim
+
 
 load_dotenv()
 
@@ -28,9 +30,15 @@ class SafeRouteChatbot:
         return response
         
     
-    def generate_response(self, user_message, context):
+    def generate_response(self, origen, destino, context):
+        # Configurar el geocodificador
+        geolocator = Nominatim(user_agent="geoapiExercises")
+
+        # Obtener la dirección
+        orig = geolocator.reverse((origen[0], origen[1]), language="es") 
+        dest = geolocator.reverse((destino[0], destino[1]), language="es")
     # Process user input
-        params = self.process_user_input(user_message)
+        params = self.process_user_input(origen, destino)
         # Get the most frequent terms in the context
         most_common_terms = Counter(context).most_common()
         
@@ -50,50 +58,13 @@ class SafeRouteChatbot:
         
     # NECESITO =====> HOTINFO (delito, frecuencia, hora_más_alta), RouteData (rutas, seguridad, horarios)
     
-    def process_user_input(self, user_message):
-        """
-        Process user input to extract route information
-        
-        Args:
-            user_message: String containing user request
-            
-        Returns:
-            dict: Extracted parameters including origin, destination, time
-        """
-        # Extract locations using regex patterns
-        origin_match = re.search(r'desde\s+([^,]+)', user_message, re.IGNORECASE) or \
-                      re.search(r'en\s+([^,]+)', user_message, re.IGNORECASE)
-        
-        dest_match = re.search(r'hasta\s+([^,]+)', user_message, re.IGNORECASE) or \
-                    re.search(r'a\s+([^,]+)', user_message, re.IGNORECASE) or \
-                    re.search(r'ir\s+a\s+([^,]+)', user_message, re.IGNORECASE)
-        
-        # Extract time information
-        time_match = re.search(r'a las\s+(\d{1,2})(?::(\d{2}))?\s*(am|pm)?', user_message, re.IGNORECASE) or \
-                    re.search(r'(\d{1,2})(?::(\d{2}))?\s*(am|pm|horas?)', user_message, re.IGNORECASE)
-        
-        # Process origin
-        origin = origin_match.group(1).strip() if origin_match else None
-        
-        # Process destination  
-        destination = dest_match.group(1).strip() if dest_match else None
-        
-        # Process time
-        hour = None
-        if time_match:
-            hour = int(time_match.group(1))
-            # Convert to 24-hour format if needed
-            if time_match.group(3) and time_match.group(3).lower() == 'pm' and hour < 12:
-                hour += 12
-            elif time_match.group(3) and time_match.group(3).lower() == 'am' and hour == 12:
-                hour = 0
-        
+    def process_user_input(self, origin, destination):
+       
         # Create parameter dictionary
         params = {
             'origin': origin,
             'destination': destination,
-            'hour': hour,
-        }
+            }
         
         return params
     
