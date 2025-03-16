@@ -175,3 +175,8 @@ cython_debug/
 
 cache_MexicoCity_walk.graphml
 crime_buffers.geojson
+crime_buffer_map_1.html
+crime_buffer_map_2.html
+crime_buffer_map_3.html
+crime_buffer_map_4.html
+crime_buffer_map_5.html
