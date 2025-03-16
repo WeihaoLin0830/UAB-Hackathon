@@ -57,7 +57,7 @@ class SafeRouteChatbot:
         
         # Combine explanations
            
-        return safest_route_explanation
+        return safest_route_explanation.text
         
         # Load routing data if available
         
@@ -143,7 +143,6 @@ class SafeRouteChatbot:
         Explica por qué esta ruta es la más segura comparando con la otra ruta más rápida, mencionando las áreas peligrosas que se evitaron y por qué son peligrosas (tipos de crímenes, horarios). Menciona también cómo el horario de viaje afecta la seguridad. La explicación debe ser clara, informativa y escrita en español.
         """
         #Áreas evitadas: {avoided_areas_str}
-        
         return prompt
     
     def _generate_explanation(self, prompt):
@@ -152,49 +151,7 @@ class SafeRouteChatbot:
         response = client.models.generate_content(
             model="gemini-2.0-flash", contents=[prompt]
         )
-        
-        # Extraer el texto de la respuesta
-        if hasattr(response, 'text'):
-            raw_text = response.text
-        elif hasattr(response, 'parts'):
-            # Alternativa si la respuesta viene estructurada en partes
-            raw_text = ''.join([part.text for part in response.parts])
-        elif hasattr(response, 'candidates') and response.candidates:
-            # Si hay candidatos en la respuesta
-            raw_text = response.candidates[0].content.parts[0].text
-        else:
-            return "No se pudo procesar la respuesta"
-        
-        # Proceso de limpieza del texto
-        # 1. Eliminar marcadores markdown innecesarios
-        clean_text = raw_text.replace('```', '').replace('#', '')
-        
-        # 2. Eliminar líneas en blanco múltiples
-        import re
-        clean_text = re.sub(r'\n\s*\n', '\n\n', clean_text)
-        
-        # 3. Eliminar información redundante o irrelevante (personalizar según necesidades)
-        # Por ejemplo, eliminar disclaimers comunes
-        disclaimers = [
-            "I am an AI language model",
-            "As an AI assistant",
-            "Note: I am an AI"
-        ]
-        for disclaimer in disclaimers:
-            clean_text = clean_text.replace(disclaimer, "")
-        
-        # 4. Extraer solo la información esencial (esto puede requerir ajustes según tu caso)
-        # Ejemplo: si la respuesta suele tener una estructura específica
-        important_sections = clean_text.split("\n\n")
-        if len(important_sections) > 1:
-            # Eliminar introducciones genéricas si existen
-            if len(important_sections[0]) < 100 and "puedo ayudarte" in important_sections[0].lower():
-                important_sections = important_sections[1:]
-        
-        # 5. Unir las secciones importantes
-        final_text = "\n\n".join(important_sections).strip()
-        
-        return final_text
+        return response
 
 
 chatbot = SafeRouteChatbot()
