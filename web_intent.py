@@ -144,18 +144,20 @@ with col_map:
         width=700,
         height=500,
         key="interactive_map",
-        returned_objects=["last_clicked", "all_drawings"]
+        center=[19.41, -99.133209],  # Coordenadas del centro de la Ciudad de México
+        zoom=12  # Nivel de zoom más cercano
+        # returned_objects=["last_clicked", "all_drawings"]
     )
     
     # Procesar clics del mapa
-    if map_data.get("last_clicked"):
+    if map_data and map_data.get("last_clicked"):
         new_point = [map_data["last_clicked"]["lat"], map_data["last_clicked"]["lng"]]
         
         if len(st.session_state.selected_points) < 2:
             st.session_state.selected_points.append(new_point)
             # Actualizar mapa manteniendo los marcadores
             st.session_state.map = create_base_map()
-            st.rerun()
+            st.experimental_rerun()
     
     # Botones de control
     col_reset, col_calc = st.columns(2)
@@ -219,69 +221,56 @@ with col_map:
                     folium.PolyLine(ruta_rapida, color="blue", weight=4, opacity=1,
                                 tooltip="Ruta más rápida").add_to(new_map)
 
+                    # Añadir leyenda
+                    legend_html = '''
+                    <div style="position: fixed; 
+                        bottom: 50px; left: 50px; width: 150px; height: 90px; 
+                        background-color: white; border:2px solid grey; z-index:9999; font-size:14px;
+                        padding: 10px; border-radius: 5px;">
+                        &nbsp; <b>Leyenda</b> <br>
+                        &nbsp; <i class="fa fa-circle" style="color:green"></i>&nbsp; Ruta más segura <br>
+                        &nbsp; <i class="fa fa-circle" style="color:blue"></i>&nbsp; Ruta más rápida <br>
+                    </div>
+                    '''
+                    new_map.get_root().html.add_child(folium.Element(legend_html))
+
+                    # Calcular los límites de la ruta
+                    todas_coordenadas = []
+                    todas_coordenadas.extend(ruta_segura)
+                    todas_coordenadas.extend(ruta_rapida)
+                
+                    lats = [coord[0] for coord in todas_coordenadas]
+                    lons = [coord[1] for coord in todas_coordenadas]
+                
+                    # Añadir margen de 0.005 grados (aproximadamente 500 metros)
+                    bounds = [
+                        [min(lats) - 0.005, min(lons) - 0.005],
+                        [max(lats) + 0.005, max(lons) + 0.005]
+                    ]
+                
+                    # Ajustar la vista del mapa a los límites calculados
+                    new_map.fit_bounds(bounds)
+
                     # Actualizar el mapa en session_state
                     st.session_state.map = new_map
-                    st.rerun()
+                    
+                    # Mostrar estadísticas de la ruta
+                    st.subheader("Estadísticas de Ruta")
+                    col_safe, col_fast = st.columns(2)
+                    
+                    with col_safe:
+                        st.write("**Ruta Más Segura**")
+                        st.write(f"Distancia: {len(ruta_segura) * 0.01:.2f} km")
+                        st.write(f"Tiempo estimado: {len(ruta_segura) * 0.2:.1f} min")
+                        
+                    with col_fast:
+                        st.write("**Ruta Más Rápida**")
+                        st.write(f"Distancia: {len(ruta_rapida) * 0.01:.2f} km")
+                        st.write(f"Tiempo estimado: {len(ruta_rapida) * 0.2:.1f} min")
                     
             except Exception as e:
                 st.error(f"Error al calcular la ruta: {e}")
         
-        if ruta:
-            ruta_segura, ruta_rapida = ruta
-            
-            # Añadir rutas al mapa
-            folium.PolyLine(ruta_segura, color="green", weight=4, opacity=1, 
-                           tooltip="Ruta más segura").add_to(new_map)
-            folium.PolyLine(ruta_rapida, color="blue", weight=4, opacity=1,
-                           tooltip="Ruta más rápida").add_to(new_map)
-
-            # Añadir leyenda
-            legend_html = '''
-            <div style="position: fixed; 
-                bottom: 50px; left: 50px; width: 150px; height: 90px; 
-                background-color: white; border:2px solid grey; z-index:9999; font-size:14px;
-                padding: 10px; border-radius: 5px;">
-                &nbsp; <b>Leyenda</b> <br>
-                &nbsp; <i class="fa fa-circle" style="color:green"></i>&nbsp; Ruta más segura <br>
-                &nbsp; <i class="fa fa-circle" style="color:blue"></i>&nbsp; Ruta más rápida <br>
-            </div>
-            '''
-            new_map.get_root().html.add_child(folium.Element(legend_html))
-
-            # Calcular los límites de la ruta
-            todas_coordenadas = []
-            todas_coordenadas.extend(ruta_segura)
-            todas_coordenadas.extend(ruta_rapida)
-        
-            lats = [coord[0] for coord in todas_coordenadas]
-            lons = [coord[1] for coord in todas_coordenadas]
-        
-            # Añadir margen de 0.005 grados (aproximadamente 500 metros)
-            bounds = [
-                [min(lats) - 0.005, min(lons) - 0.005],
-                [max(lats) + 0.005, max(lons) + 0.005]
-            ]
-        
-            # Ajustar la vista del mapa a los límites calculados
-            new_map.fit_bounds(bounds)
-
-            # Actualizar el mapa en session_state
-            st.session_state.map = new_map
-            
-            # Mostrar estadísticas de la ruta
-            st.subheader("Estadísticas de Ruta")
-            col_safe, col_fast = st.columns(2)
-            
-            with col_safe:
-                st.write("**Ruta Más Segura**")
-                st.write(f"Distancia: {len(ruta_segura) * 0.01:.2f} km")
-                st.write(f"Tiempo estimado: {len(ruta_segura) * 0.2:.1f} min")
-                
-            with col_fast:
-                st.write("**Ruta Más Rápida**")
-                st.write(f"Distancia: {len(ruta_rapida) * 0.01:.2f} km")
-                st.write(f"Tiempo estimado: {len(ruta_rapida) * 0.2:.1f} min")
-    
     # Información contextual
     st.info("Selecciona dos puntos en el mapa y haz clic en 'Calcular Ruta' para ver rutas seguras y rápidas entre ellos.")
 
