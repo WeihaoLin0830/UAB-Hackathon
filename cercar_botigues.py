@@ -434,6 +434,7 @@ def buscar_con_coordenadas(busqueda, lat, lon, radio=5000):
         list: Lista de lugares encontrados
     """
     return buscar_lugares_cercanos(busqueda, lat, lon, radio)
+
 # Ejemplo de uso
 if __name__ == "__main__":
     # Ejemplo con coordenadas fijas (Ciudad de México - Zócalo)
