@@ -37,7 +37,7 @@ class SafeRouteChatbot:
     
     def generate_response(self, origen, destino, context):
         # Configurar el geocodificador
-        geolocator = Nominatim(user_agent="geoapiExercises")
+        geolocator = Nominatim(user_agent="safe_route_chatbot")
 
         # Obtener la dirección
         orig = geolocator.reverse((origen[0], origen[1]), language="es") 
@@ -198,7 +198,7 @@ class SafeRouteChatbot:
 
 
 chatbot = SafeRouteChatbot()
-chatbot.generate_response((40.4167, -3.70325), (41.38879, 2.15899), ['c1', 'c2', 'c3', 'c4', 'c5', 'c6', 'c7', 'c8', 'c9', 'c10'])
+print(chatbot.generate_response((40.4167, -3.70325), (41.38879, 2.15899), ['c1', 'c2', 'c3', 'c4', 'c5', 'c6', 'c7', 'c8', 'c9', 'c10']))
 
 '''
 # Modo     
