@@ -154,8 +154,6 @@ class SafeRouteChatbot:
         return response
 
 
-chatbot = SafeRouteChatbot()
-print(chatbot.generate_response((40.4167, -3.70325), (41.38879, 2.15899), ['c1', 'c2', 'c3', 'c4', 'c5', 'c6', 'c7', 'c8', 'c9', 'c10']))
 
 '''
 # Modo     
