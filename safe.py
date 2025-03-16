@@ -1,17 +1,11 @@
-import pandas as pd
-import geopandas as gpd
-import numpy as np
-from transformers import AutoTokenizer, AutoModelForCausalLM
-import torch
-from shapely.geometry import Point, LineString
-import re
-from datetime import datetime
-from geopy.geocoders import Nominatim
+
 import os
+import re
 import json
 from google import genai
 from dotenv import load_dotenv
-from principal_functions import *
+from collections import Counter
+
 load_dotenv()
 
 API_KEY = os.getenv("API_KEY")
@@ -35,52 +29,19 @@ class SafeRouteChatbot:
         return response
         
     
-    def generate_response(self, user_message):
+    def generate_response(self, user_message, context):
     # Process user input
         params = self.process_user_input(user_message)
-        # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$ ==> lista de delitos, frecuencia, hora_más_alta
-        '''orig = geolocator.geocode(params['origin'])
-        dest = geolocator.geocode(params['destination'])
+        # Get the most frequent terms in the context
+        most_common_terms = Counter(context).most_common()
         
-        if not orig or not dest:
-            return "No se pudo encontrar la ubicación de origen o destino. Por favor, verifica las direcciones proporcionadas."
-        
-        orig_point = Point(orig.longitude, orig.latitude)
-        dest_point = Point(dest.longitude, dest.latitude)
-        
-        # Load crime buffer data
-        crime_data = gpd.read_file('crime_buffer.geojson')
-        
-        # Filter zones (buffers) that are between origin and destination
-        line = LineString([orig_point, dest_point])
-        filtered_zones = crime_data[crime_data.geometry.intersects(line)]
-        
-        if filtered_zones.empty:
-            return "No se encontraron zonas de crimen entre el origen y el destino."
-        
-        # Extract relevant information from filtered zones
-        # Calculate 'crime_type' and 'highest_hour'
-        filtered_zones['crime_type'] = filtered_zones['crime_data'].apply(lambda x: max(x, key=x.get))
-        filtered_zones['highest_hour'] = filtered_zones['crime_data'].apply(lambda x: max(x.values()))
-        
-        crime_info = filtered_zones[['crime_type', 'highest_hour']].to_dict(orient='records')
-        
-        # Add crime info to route data
-        route_data = {
-            "shortest": "ruta más corta",
-            "safest": "ruta más segura",
-            "crime_info": crime_info
-        }
-        '''
         # Check if we have enough information
         if not params['origin'] or not params['destination']:
             return "Necesito saber tu origen y destino para recomendarte una ruta segura. Por favor, indícame desde dónde y hasta dónde quieres ir."
         
-        # Get routes from external function
-        
         
         # Generate explanation for both routes
-        safest_route_explanation = self.get_route_explanation(params)
+        safest_route_explanation = self.get_route_explanation(most_common_terms, params)
         
         # Combine explanations
            
@@ -137,7 +98,7 @@ class SafeRouteChatbot:
         
         return params
     
-    def get_route_explanation(self, params):
+    def get_route_explanation(self, most_common_terms, params):
         """
         Generate explanation for why a specific route was chosen
         
@@ -150,7 +111,7 @@ class SafeRouteChatbot:
         """
         
         # Build prompt for LLM
-        prompt = self._build_explanation_prompt(params)
+        prompt = self._build_explanation_prompt(most_common_terms, params)
         
         # Generate explanation
         explanation = self._generate_explanation(prompt)
@@ -201,7 +162,8 @@ class SafeRouteChatbot:
         Destino: {destination}
         Hora del día: {time_description} ({hour}:00 horas)
         Nivel de riesgo por horario: {time_risk}
-        
+        El delicto más frecuente en la ruta es: {route_data}
+    
         Explica por qué esta ruta es la más segura comparando con la otra ruta más rápida, mencionando las áreas peligrosas que se evitaron y por qué son peligrosas (tipos de crímenes, horarios). Menciona también cómo el horario de viaje afecta la seguridad. La explicación debe ser clara, informativa y escrita en español.
         """
         #Áreas evitadas: {avoided_areas_str}
@@ -215,7 +177,7 @@ class SafeRouteChatbot:
         )        
             
         return response
-
+'''
 # Modo     
 def conect():
     chatbot = SafeRouteChatbot()
@@ -245,4 +207,4 @@ def conect():
         print(response)
 
     
-        
+        '''
