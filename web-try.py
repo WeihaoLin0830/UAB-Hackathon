@@ -96,16 +96,24 @@ with col_map:
 if st.button("Haz clic aquí para una sorpresa"):
     st.write("¡Sorpresa! Has hecho clic en el botón.")
 
-    punto = [19.294918,-99.175004]
+    punto = [19.294918, -99.175004]
+    px = (punto[1], punto[0])
+    # Add the point to the map
+    folium.Marker(
+        location=px,
+        popup="Punto Inicial",
+        tooltip="Punto Inicial"
+    ).add_to(m)
 
     # Generate a random point within 2 km radius
-    from math import cos, sin
+    from math import cos, sin, pi
+
     def random_point_within_radius(center, radius_km):
         radius_deg = radius_km / 111  # Rough conversion from km to degrees
         u = random.uniform(0, 1)
         v = random.uniform(0, 1)
         w = radius_deg * (u ** 0.5)
-        t = 2 * 3.141592653589793 * v
+        t = 2 * pi * v
         x = w * cos(t)
         y = w * sin(t)
         return [center[0] + x, center[1] + y]
@@ -116,3 +124,6 @@ if st.button("Haz clic aquí para una sorpresa"):
 
     # Add the route to the map
     folium.PolyLine(ruta, color="red", weight=2.5, opacity=1).add_to(m)
+
+    # Display the map
+    folium_static(m, width=700)
