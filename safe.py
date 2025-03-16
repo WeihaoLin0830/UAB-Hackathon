@@ -21,13 +21,18 @@ client = genai.Client(api_key = API_KEY)
 
 #  Adaptar las llamadas a diferentes funciones dependiendo de la hora del día.
 
+
 class SafeRouteChatbot:
 
-    def free(self, user_message):
+    def free(self, user_message, context=[]):
+        if context:
+            prompt = f"""
+            {user_message} + {context}
+            """
         response = client.models.generate_content(
-            model="gemini-2.0-flash", contents=[user_message]
+            model="gemini-2.0-flash", contents=[prompt]
         )        
-        return response
+        return response.text
         
     
     def generate_response(self, origen, destino, context):
@@ -142,18 +147,62 @@ class SafeRouteChatbot:
         return prompt
     
     def _generate_explanation(self, prompt):
-        """Generate explanation using LLM"""
+        """Generate explanation using LLM and clean the response"""
+        # Obtener respuesta del modelo
         response = client.models.generate_content(
             model="gemini-2.0-flash", contents=[prompt]
-        )        
-            
-        return response
-    
+        )
+        
+        # Extraer el texto de la respuesta
+        if hasattr(response, 'text'):
+            raw_text = response.text
+        elif hasattr(response, 'parts'):
+            # Alternativa si la respuesta viene estructurada en partes
+            raw_text = ''.join([part.text for part in response.parts])
+        elif hasattr(response, 'candidates') and response.candidates:
+            # Si hay candidatos en la respuesta
+            raw_text = response.candidates[0].content.parts[0].text
+        else:
+            return "No se pudo procesar la respuesta"
+        
+        # Proceso de limpieza del texto
+        # 1. Eliminar marcadores markdown innecesarios
+        clean_text = raw_text.replace('```', '').replace('#', '')
+        
+        # 2. Eliminar líneas en blanco múltiples
+        import re
+        clean_text = re.sub(r'\n\s*\n', '\n\n', clean_text)
+        
+        # 3. Eliminar información redundante o irrelevante (personalizar según necesidades)
+        # Por ejemplo, eliminar disclaimers comunes
+        disclaimers = [
+            "I am an AI language model",
+            "As an AI assistant",
+            "Note: I am an AI"
+        ]
+        for disclaimer in disclaimers:
+            clean_text = clean_text.replace(disclaimer, "")
+        
+        # 4. Extraer solo la información esencial (esto puede requerir ajustes según tu caso)
+        # Ejemplo: si la respuesta suele tener una estructura específica
+        important_sections = clean_text.split("\n\n")
+        if len(important_sections) > 1:
+            # Eliminar introducciones genéricas si existen
+            if len(important_sections[0]) < 100 and "puedo ayudarte" in important_sections[0].lower():
+                important_sections = important_sections[1:]
+        
+        # 5. Unir las secciones importantes
+        final_text = "\n\n".join(important_sections).strip()
+        
+        return final_text
+
+
+chatbot = SafeRouteChatbot()
+chatbot.generate_response((40.4167, -3.70325), (41.38879, 2.15899), ['c1', 'c2', 'c3', 'c4', 'c5', 'c6', 'c7', 'c8', 'c9', 'c10'])
 
 '''
 # Modo     
 def conect():
-    chatbot = SafeRouteChatbot()
     
     print("Modo interactivo. Escribe 'salir' para terminar.")
     while True:
