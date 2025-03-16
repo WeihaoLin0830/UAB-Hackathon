@@ -157,15 +157,14 @@ def fast_edge_weight_calculation(graph, buffer_gdf, weight_col='weight'):
 
 def get_path(origin_node,destination_node,filtered_graph):
 
-    """shortest_route = nx.shortest_path(filtered_graph, origin_node, destination_node, weight='length')
+    shortest_route = nx.shortest_path(filtered_graph, origin_node, destination_node, weight='length')
     route_coords = [(filtered_graph.nodes[node]['y'], filtered_graph.nodes[node]['x']) for node in shortest_route]
-    folium.PolyLine(route_coords, color='blue', weight=4, opacity=0.7).add_to(crime_map)"""
 
     safest_route = nx.shortest_path(filtered_graph, origin_node, destination_node, weight='combined_weight')
 
     safest_route_coords = [(filtered_graph.nodes[node]['y'], filtered_graph.nodes[node]['x']) for node in safest_route]
 
-    return safest_route_coords
+    return safest_route_coords, route_coords 
     
     #folium.PolyLine(safest_route_coords, color='green', weight=4, opacity=0.7).add_to(crime_map)
 
