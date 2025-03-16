@@ -13,7 +13,6 @@ API_KEY = os.getenv("API_KEY")
 print(API_KEY)
 
 client = genai.Client(api_key = API_KEY)
-geolocator = Nominatim(user_agent="geoapiExercises")
 
 # Buscar una ubicació
 
@@ -177,6 +176,8 @@ class SafeRouteChatbot:
         )        
             
         return response
+    
+
 '''
 # Modo     
 def conect():
