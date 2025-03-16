@@ -7,8 +7,10 @@ from math import cos, sin, pi
 from folium.plugins import Draw
 from streamlit_folium import st_folium
 from principal_functions import buscar_ruta, get_intersecting_crimes
+from safe import SafeRouteChatbot
 
 # Configuración inicial de la página
+chat = SafeRouteChatbot()
 st.set_page_config(page_title="Chatbot con Mapa", layout="wide")
 
 # Función para carga de datos
@@ -32,7 +34,7 @@ st.markdown("""
     
     /* Make the chat input stick to the bottom */
     section[data-testid="stChatMessageInputContainer"] {
-        position: fixed !important;
+        position: relative !important;
         bottom: 0 !important;
         left: 0 !important;
         padding: 1rem !important;
@@ -45,10 +47,14 @@ st.markdown("""
     /* Ensure chat messages are visible above the fixed input */
     [data-testid="stChatMessageContainer"] {
         margin-bottom: 70px !important; /* Space for the fixed input */
+        position: relative !important;
+        bottom: 0 !important;
     }
     
     /* Style the chat input field */
     .stChatInput input, div[data-testid="stChatInput"] input {
+        position: relative !important;
+        bottom: 0 !important;
         border: 1px solid #ddd !important;
         border-radius: 20px !important;
         padding: 8px 15px !important;
@@ -133,7 +139,7 @@ def update_map():
     if st.session_state.map_state['routes']:
         ruta_segura, ruta_rapida = st.session_state.map_state['routes']
         folium.PolyLine(ruta_segura, color='green', weight=3).add_to(m)
-        folium.PolyLine(ruta_rapida, color='blue', weight=3).add_to(m)
+        folium.PolyLine(ruta_rapida, color='red', weight=3).add_to(m)
         
         # Ajustar el zoom para mostrar toda la ruta
         bounds = get_route_bounds(st.session_state.map_state['routes'])
@@ -174,12 +180,8 @@ with col1:
             st.session_state.messages.append({"role": "user", "content": prompt})
             
             # Simular respuesta del bot
-            respuestas = [
-                "He actualizado el mapa con tu selección",
-                "Mostrando rutas seguras en el mapa",
-                "Analizando mejores rutas para ti..."
-            ]
-            respuesta = random.choice(respuestas)
+
+            respuesta = chat.free(prompt)
             
             # Añadir respuesta del bot
             st.session_state.messages.append({"role": "assistant", "content": respuesta})
@@ -195,7 +197,7 @@ with col2:
     with st.container(height=600):
         map_data = st_folium(
             update_map(),
-            width=700,
+            width=850,
             height=550,
             key="main_map",
             returned_objects=["last_clicked", "bounds", "zoom"]
@@ -240,7 +242,7 @@ with col2:
 
     # Calculo de rutas
     if len(st.session_state.map_state['points']) == 2:
-        periodo = st.selectbox("Seleccionar período:", ["Madrugada", "Mañana", "Tarde", "Noche"])
+        periodo = st.selectbox("Seleccionar período:", ["Mediodia", "Mañana", "Tarde", "Noche","Medianoche","Madrugada","Todo"])
         
         if st.button("🚀 Calcular rutas", use_container_width=True):
             with st.spinner("Calculando mejores rutas..."):
@@ -254,13 +256,10 @@ with col2:
                     )
 
                     msg_lst = get_intersecting_crimes(rutas[1], data['crime'])
-    
-                    str_lst = "\n".join(f"- {i}" for i in msg_lst)
+                    print(msg_lst)
+                    answer = chat.generate_response(origen, destino, msg_lst)
 
-                    st.session_state.messages.append({
-                        "role": "assistant",
-                        "content": "Las rutas han sido calculadas. Aquí están los detalles de los crímenes intersectados:\n" + "\n".join(msg_lst)
-                    })
+                    st.session_state.messages.append(answer)
                     
                     st.session_state.map_state['routes'] = rutas
                     st.rerun()
