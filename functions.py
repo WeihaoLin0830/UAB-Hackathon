@@ -5,6 +5,11 @@ from shapely.geometry import Point
 import osmnx as ox
 from shapely.geometry import Polygon
 
+def load_crimes_geojson(file_path):
+    return gpd.read_file(file_path)
+
+crimes_gdf = load_crimes_geojson('crimes.geojson')
+
 def mid_point(origin, destination):
         # Calculate the L2 distance between origin and destination
     l2_distance = np.linalg.norm(np.array(origin) - np.array(destination))
@@ -40,10 +45,22 @@ def crop_graph(origin, destination, graph):
     
     return subgraph
 
-def night(origin, destination, graph):
-    prova = pd.read_csv('CMX_noche.csv')
+def buscar_ruta(origin, destination, time, graph):
+    if time in crimes_gdf['time'].unique():
+        crimes_df = crimes_gdf[crimes_gdf['time'] == time]
+    else:
+        crimes_df = crimes_gdf.copy()
 
-    
+    origin_node = ox.get_nearest_node(graph, origin)
+    destination_node = ox.get_nearest_node(graph, destination)
+
+    region = crop_graph(origin, destination, graph)
+
+    route = ox.shortest_path(graph, origin_node, destination_node, weight='length')
+
+    return route
+
+
 
 filtered_buffers = crop_buffers(origin, destination, buffer_gdf)
 filtered_graph = crop_graph(origin, destination, graph)
