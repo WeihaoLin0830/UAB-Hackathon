@@ -1,15 +1,12 @@
-import pandas as pd
-import geopandas as gpd
-import numpy as np
-from transformers import AutoTokenizer, AutoModelForCausalLM
-import torch
-from shapely.geometry import Point, LineString
-import re
-from datetime import datetime
+
 import os
+import re
 import json
 from google import genai
 from dotenv import load_dotenv
+from collections import Counter
+from geopy.geocoders import Nominatim
+
 
 load_dotenv()
 
@@ -19,60 +16,39 @@ print(API_KEY)
 
 client = genai.Client(api_key = API_KEY)
 
+# Buscar una ubicació
 
-def get_routes(origin, destination, hour):
-    """
-    External function to get the safest and fastest routes.
-    
-    Args:
-        origin: Starting location
-        destination: Ending location
-        hour: Time of day
-        
-    Returns:
-        dict: Dictionary containing the safest and fastest routes
-    """
-    # Mock implementation, replace with actual logic
-    safest_route = {
-        'route_id': 'safest_route',
-        'safety_score': 90,
-        'time': 30,  # in minutes
-        'avoided_areas': ['Area1', 'Area2'],
-        'avoided_crime_types': ['Robo', 'Asalto']
-    }
-    
-    fastest_route = {
-        'route_id': 'fastest_route',
-        'safety_score': 70,
-        'time': 20,  # in minutes
-        'avoided_areas': ['Area3'],
-        'avoided_crime_types': ['Vandalismo']
-    }
-    
-    return {
-        'safest_route': safest_route,
-        'fastest_route': fastest_route
-    }
 
 #  Adaptar las llamadas a diferentes funciones dependiendo de la hora del día.
 
 class SafeRouteChatbot:
 
-    def generate_response(self, user_message):
+    def free(self, user_message):
+        response = client.models.generate_content(
+            model="gemini-2.0-flash", contents=[user_message]
+        )        
+        return response
+        
+    
+    def generate_response(self, origen, destino, context):
+        # Configurar el geocodificador
+        geolocator = Nominatim(user_agent="geoapiExercises")
+
+        # Obtener la dirección
+        orig = geolocator.reverse((origen[0], origen[1]), language="es") 
+        dest = geolocator.reverse((destino[0], destino[1]), language="es")
     # Process user input
-        params = self.process_user_input(user_message)
-        # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$ ==> lista de delitos, frecuencia, hora_más_alta
-        route_data = 
+        params = self.process_user_input(origen, destino)
+        # Get the most frequent terms in the context
+        most_common_terms = Counter(context).most_common()
         
         # Check if we have enough information
         if not params['origin'] or not params['destination']:
             return "Necesito saber tu origen y destino para recomendarte una ruta segura. Por favor, indícame desde dónde y hasta dónde quieres ir."
         
-        # Get routes from external function
-        routes = get_routes(params['origin'], params['destination'], params['hour'])
         
         # Generate explanation for both routes
-        safest_route_explanation = self.get_route_explanation(routes['safest_route'], params)
+        safest_route_explanation = self.get_route_explanation(most_common_terms, params)
         
         # Combine explanations
            
@@ -82,54 +58,17 @@ class SafeRouteChatbot:
         
     # NECESITO =====> HOTINFO (delito, frecuencia, hora_más_alta), RouteData (rutas, seguridad, horarios)
     
-    def process_user_input(self, user_message):
-        """
-        Process user input to extract route information
-        
-        Args:
-            user_message: String containing user request
-            
-        Returns:
-            dict: Extracted parameters including origin, destination, time
-        """
-        # Extract locations using regex patterns
-        origin_match = re.search(r'desde\s+([^,]+)', user_message, re.IGNORECASE) or \
-                      re.search(r'en\s+([^,]+)', user_message, re.IGNORECASE)
-        
-        dest_match = re.search(r'hasta\s+([^,]+)', user_message, re.IGNORECASE) or \
-                    re.search(r'a\s+([^,]+)', user_message, re.IGNORECASE) or \
-                    re.search(r'ir\s+a\s+([^,]+)', user_message, re.IGNORECASE)
-        
-        # Extract time information
-        time_match = re.search(r'a las\s+(\d{1,2})(?::(\d{2}))?\s*(am|pm)?', user_message, re.IGNORECASE) or \
-                    re.search(r'(\d{1,2})(?::(\d{2}))?\s*(am|pm|horas?)', user_message, re.IGNORECASE)
-        
-        # Process origin
-        origin = origin_match.group(1).strip() if origin_match else None
-        
-        # Process destination  
-        destination = dest_match.group(1).strip() if dest_match else None
-        
-        # Process time
-        hour = None
-        if time_match:
-            hour = int(time_match.group(1))
-            # Convert to 24-hour format if needed
-            if time_match.group(3) and time_match.group(3).lower() == 'pm' and hour < 12:
-                hour += 12
-            elif time_match.group(3) and time_match.group(3).lower() == 'am' and hour == 12:
-                hour = 0
-        
+    def process_user_input(self, origin, destination):
+       
         # Create parameter dictionary
         params = {
             'origin': origin,
             'destination': destination,
-            'hour': hour,
-        }
+            }
         
         return params
     
-    def get_route_explanation(self, route_data, params):
+    def get_route_explanation(self, most_common_terms, params):
         """
         Generate explanation for why a specific route was chosen
         
@@ -140,11 +79,9 @@ class SafeRouteChatbot:
         Returns:
             String explanation of route safety considerations
         """
-        # Get route data (in practice, this would come from routing engine)
-        route_data = route_data
         
         # Build prompt for LLM
-        prompt = self._build_explanation_prompt(route_data, params)
+        prompt = self._build_explanation_prompt(most_common_terms, params)
         
         # Generate explanation
         explanation = self._generate_explanation(prompt)
@@ -186,18 +123,17 @@ class SafeRouteChatbot:
         #avoided_areas_str = ", ".join(avoided_areas) if avoided_areas else "ninguna área de alto riesgo"
         
         # Crime types in avoided areas
-        avoided_crime_types = route_data.get('avoided_crime_types', [])
+        '''avoided_crime_types = route_data.get('avoided_crime_types', [])
         crime_types_str = ", ".join(avoided_crime_types) if avoided_crime_types else "ningún tipo de delito específico"
-        
-        
+        '''
         # Build prompt
         prompt = f"""
         Origen: {origin}
         Destino: {destination}
         Hora del día: {time_description} ({hour}:00 horas)
         Nivel de riesgo por horario: {time_risk}
-        Tipos de delitos comunes en áreas evitadas: {crime_types_str}
-        
+        El delicto más frecuente en la ruta es: {route_data}
+    
         Explica por qué esta ruta es la más segura comparando con la otra ruta más rápida, mencionando las áreas peligrosas que se evitaron y por qué son peligrosas (tipos de crímenes, horarios). Menciona también cómo el horario de viaje afecta la seguridad. La explicación debe ser clara, informativa y escrita en español.
         """
         #Áreas evitadas: {avoided_areas_str}
@@ -211,24 +147,36 @@ class SafeRouteChatbot:
         )        
             
         return response
+    
 
-chatbot = SafeRouteChatbot()
-print("Modo interactivo. Escribe 'salir' para terminar.")
-while True:
-    try:
-        user_input = input("\n¿Qué ruta quieres consultar? > ")
-        if user_input.lower() in ['salir', 'exit', 'quit']:
-            break
+'''
+# Modo     
+def conect():
+    chatbot = SafeRouteChatbot()
+    
+    print("Modo interactivo. Escribe 'salir' para terminar.")
+    while True:
+        try:
+            user_input = input("\n¿Qué ruta quieres consultar? > ")
+            if user_input.lower() in ['salir', 'exit', 'quit']:
+                break
+                
+            # Process user input
+            response = chatbot.generate_response(user_input)
+            print("\nRespuesta:")
+            print(response)
             
-        # Process user input
-        response = chatbot.generate_response(user_input)
+        except KeyboardInterrupt:
+            print("\nSesión terminada.")
+            break
+        except Exception as e:
+            print(f"Error: {e}")
+    
+    if False:
+        user_input = input("\n¿Qué ruta quieres consultar? > ")
+        response = chatbot.free(user_input)
         print("\nRespuesta:")
         print(response)
-        
-    except KeyboardInterrupt:
-        print("\nSesión terminada.")
-        break
-    except Exception as e:
-        print(f"Error: {e}")
+
     
-        
+        '''
