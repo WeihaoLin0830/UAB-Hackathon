@@ -163,7 +163,9 @@ st.sidebar.header("📅 Selección de Hora y Chatbot")
 selected_time = st.sidebar.selectbox("Selecciona la hora:", ["madrugada", "mañana", "mediodia", "tarde", "noche", "medianoche"])
 st.sidebar.write(f"⌚ Hora seleccionada: **{selected_time}**")
 
-# --- SECCIÓN DE CHATBOT EN SIDEBAR ---
+import streamlit as st
+import requests  # Para hacer la petición a la API
+
 st.sidebar.markdown("### 🤖 Chatbot Asistente")
 
 # Mostrar historial de mensajes con contenedor desplazable
@@ -173,7 +175,11 @@ chat_container = st.sidebar.container()
 # Crear el contenedor con clase CSS personalizada para desplazamiento
 chat_container.markdown('<div class="chat-container">', unsafe_allow_html=True)
 
-# Mostrar mensajes - nota que los mostramos en orden inverso para column-reverse
+# Inicializar el historial de mensajes si no existe
+if "messages" not in st.session_state:
+    st.session_state.messages = []
+
+# Mostrar mensajes - en orden inverso para column-reverse
 for message in reversed(st.session_state.messages):
     if message["role"] == "user":
         chat_container.markdown(f'<div class="chat-message user"><div class="chat-bubble">👤 {message["content"]}</div></div>', unsafe_allow_html=True)
@@ -183,14 +189,44 @@ for message in reversed(st.session_state.messages):
 # Cerrar el contenedor
 chat_container.markdown('</div>', unsafe_allow_html=True)
 
-# Entrada de usuario con callback en lugar de rerun
+# Función para manejar el envío del mensaje
+def on_submit_chat():
+    user_message = st.session_state.chat_input.strip()
+    if not user_message:
+        return
+
+    # Agregar el mensaje del usuario al historial
+    st.session_state.messages.append({"role": "user", "content": user_message})
+
+    # Llamar a la API para obtener la respuesta del chatbot
+    API_URL = "https://tu-api.com/endpoint"  # Reemplaza con la URL real de tu API
+    payload = {"message": user_message}
+
+    try:
+        response = requests.post(API_URL, json=payload)
+        response_data = response.json()
+        bot_response = response_data.get("reply", "Lo siento, no tengo respuesta en este momento.")  # Ajusta según la API
+
+    except Exception as e:
+        bot_response = f"Error al conectar con la API: {str(e)}"
+
+    # Agregar la respuesta del chatbot al historial
+    st.session_state.messages.append({"role": "bot", "content": bot_response})
+
+    # Limpiar la entrada del usuario
+    st.session_state.chat_input = ""
+    st.rerun()
+
+# Entrada de usuario con callback
 st.sidebar.text_input("Escribe tu pregunta aquí:", key="chat_input", on_change=on_submit_chat)
 
 # Botón para limpiar la conversación
 if st.sidebar.button("Limpiar Conversación"):
-    clear_chat()
+    st.session_state.messages = []
+    st.rerun()
 
 st.markdown("---")  # Línea divisoria
+
 
 # ---- MAPA INTERACTIVO ----
 st.markdown("### 📍 Mapa Interactivo")
