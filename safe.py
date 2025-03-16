@@ -38,7 +38,7 @@ class SafeRouteChatbot:
         orig = geolocator.reverse((origen[0], origen[1]), language="es") 
         dest = geolocator.reverse((destino[0], destino[1]), language="es")
     # Process user input
-        params = self.process_user_input(origen, destino)
+        params = self.process_user_input(orig, dest)
         # Get the most frequent terms in the context
         most_common_terms = Counter(context).most_common()
         
@@ -64,6 +64,7 @@ class SafeRouteChatbot:
         params = {
             'origin': origin,
             'destination': destination,
+            'hour': None,
             }
         
         return params
