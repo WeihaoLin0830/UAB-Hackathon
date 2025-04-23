@@ -54,7 +54,7 @@ This solution was created for PayRetailers' challenge focused on solving real-wo
 
 ## Team Members
 
-- Sergi Flores Marín
+- Sergi Flores
 - Jiahui Chen
 - Weihao Lin
 - Clàudia Gallego
